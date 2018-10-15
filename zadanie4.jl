@@ -9,5 +9,3 @@ function xnotx()
 end
 
 println(xnotx())
-
-# b)

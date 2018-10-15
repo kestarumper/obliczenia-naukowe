@@ -17,14 +17,10 @@ end
 
 function MAX(dataType)
     x = dataType(1)
-    while isinf(x * 2) == false
-        x = x * 2
+    while isinf(x * dataType(2.0)) == false
+        x = x * dataType(2.0)
     end
-    add = x/2
-    while isinf(x + add) == false
-        x = x + add
-        add = add / 2
-    end
+    x = x * (dataType(2.0) - eps(dataType))
     return x
 end
 
@@ -34,19 +30,25 @@ println("a)")
 for dataType in DATATYPES
     println(dataType)
     println("machEps = $(machEps(dataType))")
-    println("eps = $(eps(dataType))\n")
+    println("eps = $(eps(dataType))")
+    println(bits(eps(dataType)))
+    println("")
 end
 
 println("b)")
 for dataType in DATATYPES
     println(dataType)
     println("myEta = $(myEta(dataType))")
-    println("nextfloat = $(nextfloat(dataType(0.0)))\n")
+    println("nextfloat = $(nextfloat(dataType(0.0)))")
+    println(bits(myEta(dataType)))
+    println("")
 end
 
 println("c)")
 for dataType in DATATYPES
     println(dataType)
     println("MAX = $(MAX(dataType))")
-    println("realmax = $(realmax(dataType))\n")
+    println("realmax = $(realmax(dataType))")
+    println(bits(MAX(dataType)))
+    println("")
 end
