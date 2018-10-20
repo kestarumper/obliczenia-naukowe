@@ -1,3 +1,6 @@
+"""
+@author Adrian Mucha
+"""
 function machEps(dataType)
     epsilon = dataType(1)
     one = dataType(1)

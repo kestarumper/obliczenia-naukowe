@@ -1,0 +1,354 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tabularx}
+\usepackage{polski}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+
+\title{Lista 1}
+\author{Adrian Mucha 236526}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Zadanie 1}
+    \subsection{Machine epsilon}
+    \subsubsection{Problem}
+        Używając języka \texttt{Julia}, napisać program wyznaczający iteracyjnie epsilony maszynowe. Epsilonem maszynowym nazywamy najmniejszą liczbę \textit{macheps} > 0 taką, że \textit{fl(1.0 + macheps) > 1.0} dla każdego typu zmiennopozycyjnego (\texttt{Float16, Float32, Float64)}.
+    \subsubsection{Rozwiązanie}
+        Znalezienie epsilonu maszynowego opisałem w kilku krokach:
+        \begin{enumerate}
+            \item przypisz do wybranego typu zmiennej $epsilon = 1.0$
+            \item wykonuj dzielenie zmiennej $epsilon$ przez 2 (przesunięcie bitowe w prawo), dopóki $1.0 + epsilon \neq 1.0$
+        \end{enumerate}
+        Po tym jak pętla zostanie zakończona, w zmiennej $epsilon$ znajdziemy najmniejszą wartość większą od zera - \texttt{macheps}. \\
+    \subsubsection{Obserwacje}
+        Im mniejsza wartość epsilona maszynowego, tym większa jest względna prezycja obliczeń. \\
+        Dla potwierdzenia, wykonajmy dodawanie $1.0 + macheps$ i przyjrzymy się zapisowi bitowemu tak otrzymanej liczby (dla \texttt{Float32}):
+        \begin{center}
+            0 01111111 00000000000000000000001
+        \end{center}
+        Jest to więc liczba, którą możemy zapisać w postaci $2^{0} \cdot 1.m$; \textit{m} jest minimalną wartością (epsilonem), czyli wyznacza precyzję arytmetyki.
+        \subsubsection{Wyniki}
+        Wyniki z Tabeli \ref{table:macheps} zgadzają się z wartościami funkcji wbudowanych oraz tymi zawartymi w pliku nagłówkowym \texttt{float.h}.
+        {\small
+        \begin{table}[h!]
+        \begin{tabularx}{\textwidth}{c X X X}
+            \hline
+             Typ & $macheps$ & eps(typ) & float.h \\
+             \hline
+             Float16 & $0.000977$ & 0.000977 & --- \\
+             Float32 & $1.1920929e-7$ & $1.1920929e-7$ & $1.192093e-07$ \\
+             Float64 & $2.220446049250313e-16$ & $2.220446049250313e-16$ & $2.220446e-16$ \\
+             \hline
+        \end{tabularx}
+        \caption{Wyniki wywołań poszczególnych funkcji dla wybranych typów wraz z danymi z pliku \texttt{float.h} języka C}
+        \label{table:macheps}
+        \end{table}
+        }
+    
+    \subsection{Eta}
+    \subsubsection{Problem}
+        Znaleźć iteracyjnie liczbę \textit{eta} taką, że $eta > 0.0$ dla wszystkich typów zmiennopozycyjnych zgodnych ze standarded \texttt{IEEE 754}.
+        \subsubsection{Rozwiązanie}
+        \begin{algorithm}
+        \caption{Iteracyjne szukanie liczby \textit{eta}}
+        \begin{algorithmic}[1]
+        \State $x\gets 1.0$
+        \While {$x / 2 \neq 0.0$}
+            \State $x\gets x / 2$
+        \EndWhile \\
+        \Return x
+        \end{algorithmic}
+        \end{algorithm}
+        Uzyskana w ten sposób liczba \textit{x} zapisana bitowo w formacie \texttt{Float32} przyjmuje postać następującą:
+        \begin{center}
+            0 00000000 00000000000000000000001 \\
+            = $1.0e-45$
+        \end{center}
+        Warto wspomnieć, że tego typu liczbę, której \texttt{cechą} są same zera - nazywamy nieznormalizowaną (subnormal).
+    \subsubsection{Wyniki}
+    Tabela \ref{table:eta} przedstawia wyniki dla następujących typów zmiennopozycyjnych:
+        {\small
+        \begin{table}[h!]
+        \centering
+        \begin{tabular}{c c c}
+            \hline
+             Typ & \textit{eta} & \textit{nextfloat(0.0)} \\
+             \hline
+             Float16 & $6.0e-8$ & $6.0e-8$ \\
+             Float32 & $1.0e-45$ & $1.0e-45$\\
+             Float64 & $5.0e-324$ & $5.0e-324$\\
+             \hline
+        \end{tabular}
+        \caption{Wartości \textit{eta} według typów zmiennoprzecinkowych}
+        \label{table:eta}
+        \end{table}
+        }
+    
+    \subsection{MAX}
+    \subsubsection{Problem}
+    Napisać program, wyznaczający iteracyjnie liczbę \textit{MAX} dla wszystkich typów zmiennopozycyjnych zgodnych ze standardem \texttt{IEEE 754}
+    \subsubsection{Rozwiązanie}
+    W pętli \texttt{while} znajdujemy maksymalną cechę liczby, a następnie mnożymy przez największą możliwą mantysę z przedziału $[1,2)$.
+    \begin{algorithm}
+        \caption{Iteracyjne szukanie \textit{MAX}}
+        \begin{algorithmic}[1]
+        \State $x\gets 1.0$
+        \While{isinf($x \cdot 2.0$) == false}
+            \State $x\gets x \cdot 2.0$
+        \EndWhile
+        \State $x \gets x \cdot (2.0 - eps)$ \\
+        \Return x
+        \end{algorithmic}
+    \end{algorithm}
+    \subsubsection{Wyniki}
+    Otrzymane wyniki w Tabeli \ref{table:MAX} zgadzają się zarówno z funkcjami wbudowanymi jak i wartościami ze standardowego pliku nagłowkowego \texttt{float.h} języka C.
+    {\small
+        \begin{table}[h!]
+        \centering
+        \begin{tabular}{c c c c}
+            \hline
+             Typ & \textit{MAX} & \textit{realmax} & float.h \\
+             \hline
+             Float16 & $6.55e-4$ & $6.55e-4$ & --- \\
+             Float32 & $3.4028235e38$ & $3.4028235e38$ & $3.402823e+38$ \\
+             Float64 & $1.7976931348623157e308$ & $1.7976931348623157e308$ & $1.797693e+308$\\
+             \hline
+        \end{tabular}
+        \caption{Wartości \textit{MAX} według typów zmiennoprzecinkowych}
+        \label{table:MAX}
+        \end{table}
+        }
+    \section{Zadanie 2 - Kahan}
+    \subsection{Problem}
+    Sprawdzić eksperymentalnie w języku \texttt{Julia} słusznośc twierdzenia Kahana: \\
+    Epsilon maszynowy można otrzymać obliczając wyrażenie $3(4/3-1)-1$ w arytmetyce zmiennopozycyjnej.
+    \subsection{Rozwiązanie}
+        $\texttt{FloatXX} \in \{\texttt{Float16}, \texttt{Float32}, \texttt{Float64}\}$
+        \begin{algorithm}
+            \caption{Kahan Epsilon}
+            \begin{algorithmic}[1]
+            \State $a\gets FloatXX(3.0)$
+            \State $b\gets FloatXX(4.0)$
+            \State $c\gets FloatXX(1.0)$
+            \State $x\gets FloatXX(a((b/a)-c)-c)$ \\
+            \Return x
+            \end{algorithmic}
+        \end{algorithm}
+    \subsection{Wyniki}
+        {\small
+        \begin{table}[h!]
+        \centering
+        \begin{tabular}{c c c}
+            \hline
+             Typ & \textit{KAHAN} & \textit{eps}\\
+             \hline
+             Float16 & $-0.000977$ & $0.000977$ \\
+             Float32 & $1.1920929e-7$ & $1.1920929e-7$ \\
+             Float64 & $-2.220446049250313e-16$ & $2.220446049250313e-16$\\
+             \hline
+        \end{tabular}
+        \caption{Wartości \textit{Twierdzenia Kahana} według typów zmiennoprzecinkowych}
+        \label{table:kahan}
+        \end{table}
+        }
+    \subsection{Obserwacja}
+        Możemy zauważyć, że \texttt{Twierdzenie Kahana} zdaje się działać prawidłowo jedynie dla typu zmiennopozycyjnego \texttt{Float32}. W innych przypadkach wartość posiada znak odwrotny, lecz gdyby zastosować wartość bezwzględną wyników, to byłyby identyczne.
+        
+    \section{Zadanie 3 - Rozkład liczb zmiennopozycyjnych}
+        \subsection{Problem}
+            Sprawdź eksperymentalnie w języku Julia, że w arytmetyce \texttt{Float64} (arytmetyce double w standarcie \texttt{IEEE 754}) liczby zmiennopozycyjne są równomiernie rozmieszczone w $[1, 2]$ z
+            krokiem $\delta = 2^{-52}$. Innymi słowy, każda liczba zmiennopozycyjna x pomiędzy 1 i 2 może
+            być przedstawione następująco $x = 1 + k\delta$ w tej arytmetyce, gdzie $k = 1, 2, . . . , 2^{52} - 1$ i
+            $\delta = 2^{-52}$.
+        \subsection{Rozwiązanie}
+            Opis algorytmu eksperymentalnego, gdzie: \\
+            $k \in \{1, 2, ... , 2^{52}-1\}$, \\
+            $\delta \gets 2^{-52}$
+            \begin{enumerate}
+                \item utworzenie zmiennej $x \gets 1.0 + k\cdot\delta$
+                \item wypisz bitową reprezentację $x$
+                \item $k \gets k + 1$
+            \end{enumerate}
+        \subsection{Obserwacje}
+            \subsubsection{Przedział [1,2]}
+                {\small
+                \begin{table}[h!]
+                \centering
+                \begin{tabular}{c c}
+                    \hline
+                     Liczba & Zapis bitowy\\
+                     \hline
+                    1.0000000000000002 & 0011111111110000000000000000\dots00000000000000001 \\
+                    1.0000000000000004 & 0011111111110000000000000000\dots00000000000000010 \\
+                    1.0000000000000007 & 0011111111110000000000000000\dots00000000000000011 \\
+                    \vdots & \vdots \\
+                    1.9999999999999993 & 0011111111111111111111111111\dots11111111111111101 \\
+                    1.9999999999999996 & 0011111111111111111111111111\dots11111111111111110 \\
+                    1.9999999999999998 & 0011111111111111111111111111\dots11111111111111111 \\
+                     \hline
+                \end{tabular}
+                \caption{Liczby i ich bitowe odpowiedniki w zakresie [1,2]}
+                \label{table:range:onetwo}
+                \end{table}
+                }
+                Patrząc na zapis binarny liczby, możemy zauważyć, że przy każdej iteracji, \textit{mantysa} \textit{x} jest modyfikowana tak, jakbyśmy dodali do niej binarną jedynkę. To znaczy, że te liczby są równomiernie rozmieszczone w $[1,2]$ z krokiem $\delta=2^{-52}$.
+            \subsubsection{Przedział [0.5, 1]}
+                {\small
+                \begin{table}[h!]
+                \centering
+                \begin{tabular}{c c}
+                    \hline
+                     Liczba & Zapis bitowy\\
+                     \hline
+$0.5000000000000001$ & $001111111110000000000000000000$\dots$00000000000000010$\\
+$0.5000000000000002$ & $001111111110000000000000000000$\dots$00000000000000100$\\
+$0.5000000000000003$ & $001111111110000000000000000000$\dots$00000000000000110$\\
+\vdots & \vdots \\
+$0.9999999999999997$ & $001111111110111111111111111111$\dots$11111111111111010$\\
+$0.9999999999999998$ & $001111111110111111111111111111$\dots$11111111111111100$\\
+$0.9999999999999999$ & $001111111110111111111111111111$\dots$11111111111111110$\\
+                \hline
+                \end{tabular}
+                \caption{Liczby i ich bitowe odpowiedniki w zakresie [0.5,1]}
+                \label{table:range:halfone}
+                \end{table}
+                }
+                
+                Wniosek jest taki, że liczby są tutaj rozmieszczone "gęściej", to znaczy, że $\delta=\frac{1}{2}\cdot2^{-52} = 2^{-53}$. Obserwacja pochodzi z faktu, że dodanie do liczb z przedziału [0.5, 1], kolejnych wartości $k\delta$, gdzie $(\delta=2^{-52})$ powoduje zmianę \textit{mantysy} o "binarną dwójkę".
+            \subsubsection{Przedział [2, 4]}
+                Symetrycznie do przedziału [0.5, 1], otrzymamy rzadsze rozmieszczenie liczb, czyli $\delta=2\cdot2^{-52}=2^{-51}$.
+            \subsubsection{Wniosek}
+                Liczby zmiennopozycyjne są rozmieszczone nierównomiernie. Liczby bliskie zeru są rozmieszczone bardzo gęsto, natomiast im zakres jest większy, tym rzadziej one występują. Jest to następstwem tego, że \texttt{cecha} rośnie coraz szybciej, lecz ilość bitów \texttt{mantysy} jest taka sama, co skutkuje stałą pojemnością liczb.
+                
+    \section{Zadanie 4}
+        \subsection{Problem}
+            Znajdź eksperymentalnie w arytmetyce \texttt{Float64} zgodnej ze standardem \texttt{IEEE 754 (double)} liczbę zmiennopozycyjną $x$ w przedziale $1 < x < 2$, taką, że $x\cdot\frac{1}{x}\neq1$; tj.
+            $fl(xfl(1/x))\neq1$ (napisz program w języku Julia znajdujący tę liczbę).
+        \subsection{Rozwiązanie}
+            Do znalezienia rozwiązania posłużymy się funkcjami języka \texttt{Julia}, a mianowicie \texttt{nextfloat($z$)}, która zwraca kolejną liczbę zmiennopozycyjną, większą od $z$.
+            \begin{algorithm}
+                \begin{algorithmic}[1]
+                \State $x\gets nextfloat(1.0)$
+                \While{$x\cdot\frac{1}{x}\neq1.0 \wedge x<2.0$}
+                    \State $x\gets nextfloat(x)$
+                \EndWhile \\
+                \Return x
+                \end{algorithmic}
+            \end{algorithm}
+        \subsection{Wynik}
+            Wynik to: $1.000000057228997$, co jednocześnie jest najmniejszą taką liczbą w tym przedziale.
+        \subsection{Wnioski}
+            Takie błędy, wynikające z ograniczonej precyzji standardu \texttt{IEEE 754} mogą prowadzić do nagromadzenia się błędu obliczeń i dać horrendalnie niepoprawne wyniki.
+        
+    \section{Zadanie 5 - Sumy}
+        \subsection{Problem}
+            Napisz program w języku Julia realizujący następujący eksperyment obliczania iloczynu skalarnego dwóch wektorów.
+            \begin{center}
+               $x = [2.718281828, -3.141592654, 1.414213562, 0.5772156649, 0.3010299957]$ \\
+                $y = [1486.2497, 878366.9879, -22.37492, 4773714.647, 0.000185049]$
+            \end{center}
+        \subsection{Wyniki}
+            {\small
+            \begin{table}[h!]
+            \centering
+            \begin{tabular}{c c c}
+                \hline
+                 Podpunkt & \texttt{Float32} & \texttt{Float64}\\
+                 \hline
+                 Do przodu & $-0.4999443$ & $1.0251881368296672e-10$ \\
+                 Od tyłu & $-0.4543457$ & $-1.5643308870494366e-10$ \\
+                 Największe-Najmniejsze & $-0.34720382$ & $0.0$\\
+                 Najmniejsze-Największe & $-0.34720382$ & $0.0$ \\
+                 \hline
+            \end{tabular}
+            \caption{Wyniki poszczególnych strategii sumowania}
+            \label{table:sums}
+            \end{table}
+            }
+            Podany w treści zadania dokładny wynik $-1.0065710700000010e^{-11}$ różni się od otrzymanych. Wszystkie wyniki są bliskie zeru, co wiąże się z faktem, że wektory ortogonalne generują duże błędy obliczeń.
+        
+    \section{Zadanie 6}
+        \subsection{Problem}
+            Policz w języku \texttt{Julia} w arytmetyce \texttt{Float64} wartości następujących funkcji
+            \begin{center}
+                $f(x) = \sqrt{x^2+1}-1$ \\
+                $g(x) = \frac{x^2}{\sqrt{x^2+1}+1}$
+            \end{center}
+            dla kolejnych wartości argumentu $x = 8^{-1}, 8^{-2}, 8^{-3}, ...$
+        \subsection{Rozwiązanie}
+            Iteracyjne wywołanie funkcji $f(x)$ oraz $g(x)$ dla kolejnych argumentów.
+        \subsection{Wyniki}
+            {\small
+            \begin{table}[h!]
+            \centering
+            \begin{tabular}{c c c}
+                \hline
+                 Parametr & $f(x)$ & $g(x)$ \\
+                 \hline
+                $8^{-1}$ & $0.0077822185373186414$ & $0.0077822185373187065$ \\
+                $8^{-2}$ & $0.00012206286282867573$ & $0.00012206286282875901$ \\
+                $8^{-3}$ & $1.9073468138230965e-6$ & $1.907346813826566e-6$ \\
+                $8^{-4}$ & $2.9802321943606103e-8$ & $2.9802321943606116e-8$ \\
+                $8^{-5}$ & $4.656612873077393e-10$ & $4.6566128719931904e-10$ \\
+                $8^{-6}$ & $7.275957614183426e-12$ & $7.275957614156956e-12$ \\
+                $8^{-7}$ & $1.1368683772161603e-13$ & $1.1368683772160957e-13$ \\
+                $8^{-8}$ & $1.7763568394002505e-15$ & $1.7763568394002489e-15$ \\
+                $8^{-9}$ & $0.0$ & $2.7755575615628914e-17$ \\
+                $8^{-10}$ & $0.0$ & $4.336808689942018e-19$ \\
+                \hline
+            \end{tabular}
+            \caption{Wyniki kolejnych iteracji funkcji $f(x)$ oraz $g(x)$}
+            \label{table:fgx}
+            \end{table}
+            }
+        \subsection{Wnioski}
+            Wyniki są zbliżone dla pierwszych 8 iteracji, lecz później, w pierwszej funkcji $f(x)$ błąd obliczeń jest ogromny. Jest to spowodowane redukcją cyfr znaczących przez odejmowanie od siebie bliskich wartości. W tych funkcjach mamy $\sqrt{x^{2}+1}\approx1$ dla małych $x$. Dlatego w funkcja $f(x)$ może dawać fałszywe wyniki.
+            
+    \section{Zadanie 7}
+        \subsection{Problem}
+            Przybliżoną wartość pochodnej $f(x)$ w punkcie $x$ można obliczyć za pomocą następującego wzoru
+            $$
+                f'(x_0)\approx\tilde{f}(x_0) = \frac{f(x_0 + h) - f(x_0)}{h}
+            $$
+            Skorzystać z tego wzoru do obliczenia w języku Julia w arytmetyce Float64 przybliżonej
+            wartości pochodnej funkcji $f(x) = sin x + cos 3x$ w punkcie $x_0 = 1$ oraz błędów $|f'(x_0) - f(x_0)|$ dla $h = 2^{-n} (n = 0, 1, 2, . . . , 54)$.
+        \subsection{Rozwiązanie}
+            Obliczenie (ręczne) pochodnej funkcji $f(x)$ ($g(x) = f'(x) = cos(x) - 3sin(3x)$).
+            W kolejnych iteracjach pętli obliczam wartość pochodnej wg. podanego wzoru wyżej i błąd względem wyniku funkcji $g(x)$.
+        \subsection{Wyniki}
+            {\small
+            \begin{table}[h!]
+            \centering
+            \begin{tabular}{c c c}
+                \hline
+                 Parametr $h$ & $f(x)$ & \texttt{Błąd} \\
+                 \hline
+                $2^{0}$ & $2.0179892252685967      $ & $1.9010469435800585$ \\
+                $2^{-1}$ & $1.8704413979316472      $ & $1.753499116243109$ \\
+                $2^{-2}$ & $1.1077870952342974      $ & $0.9908448135457593$ \\
+                \vdots & \vdots & \vdots \\
+                $2^{-26}$ & $0.11694233864545822     $ & $5.6956920069239914e-8$ \\
+                $2^{-27}$ & $0.11694231629371643     $ & $3.460517827846843e-8$ \\
+                $2^{-28}$ & $0.11694228649139404     $ & $4.802855890773117e-9$ \\
+                $2^{-29}$ & $0.11694222688674927     $ & $5.480178888461751e-8$ \\
+                $2^{-30}$ & $0.11694216728210449     $ & $1.1440643366000813e-7$ \\
+                \vdots & \vdots & \vdots \\
+                $2^{-52}$ & $-0.5                    $ & $0.6169422816885382$ \\
+                $2^{-53}$ & $0.0                     $ & $0.11694228168853815$ \\
+                $2^{-54}$ & $0.0                     $ & $0.11694228168853815$ \\
+                \hline
+            \end{tabular}
+            \caption{Wyniki kolejnych iteracji funkcji $f(x)$ oraz $g(x)$}
+            \label{table:derivative}
+            \end{table}
+            }
+        \subsection{Wnioski}
+            Od pewnego momentu zmniejszanie $h$ nie pomaga ze względu na błędy dokładności operacji $1.0 + h$.
+            Ten błąd jest nie tylko miejscowy, ale przekłada się na dalsze obliczenia tej funkcji, które mogą spowodować horrendalnie duży błąd względny. Najmniejszy błąd obserwujemy dla parametru $h = 2^{-28}$.
+        
+\end{document}

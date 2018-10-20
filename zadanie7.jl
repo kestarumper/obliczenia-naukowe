@@ -1,5 +1,7 @@
-using Plots
-
+"""
+@author Adrian Mucha
+"""
+# using Plots
 function derivative(func::Function, x0::Float64 = 1.0, n::Int = 28)
     h = 2.0^(-n)
     return (func(x0 + h) - f(x0)) / h
@@ -7,10 +9,9 @@ end
 
 function printTruplets(truplets)
     for trup in truplets
-        print(rpad("n = $(trup[1])", 8))
+        print(rpad("\$2^{-$(trup[1])}\$ & \$", 8))
         print(rpad(trup[2], 24))
-        print("err = $(trup[3])")
-        print("\n")
+        print("\$ & \$$(trup[3])\$ \\\\\n")
     end
 end
 
@@ -31,12 +32,10 @@ for n in 0:54
 end
 
 printTruplets(dataset)
-
-toplot_x(arr) = [sample[1] for sample in arr]
-toplot_y(arr) = [sample[3] for sample in arr]
-
-args = toplot_y(dataset)
-
 println("Minimal error: $(smallestErr[2]) for n = $(smallestErr[1])")
-plot(toplot_x(dataset), toplot_y(dataset), title="Error due to original value", dpi=600)
-scatter!(toplot_x(dataset), toplot_y(dataset))
+
+# toplot_x(arr) = [sample[1] for sample in arr]
+# toplot_y(arr) = [sample[3] for sample in arr]
+# args = toplot_y(dataset)
+# plot(toplot_x(dataset), toplot_y(dataset), title="Error due to original value", dpi=600)
+# scatter!(toplot_x(dataset), toplot_y(dataset))

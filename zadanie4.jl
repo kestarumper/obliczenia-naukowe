@@ -1,3 +1,6 @@
+"""
+@author Adrian Mucha
+"""
 function xnotx()
     x = nextfloat(Float64(1.0))
     one = Float64(1.0)

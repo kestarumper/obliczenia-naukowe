@@ -1,3 +1,6 @@
+"""
+@author Adrian Mucha
+"""
 function kahanMachEps(dataType)
     a = dataType(3.0)
     b = dataType(4.0)

@@ -1,11 +1,11 @@
 """
 @author Adrian Mucha
 """
-f(x) = Float64(sqrt(x^2 + 1) - 1)
-g(x) = Float64(x^2 / (sqrt(x^2 + 1) + 1))
+f(x) = Float64(sqrt(x^2 + 1.0) - 1.0)
+g(x) = Float64(x^2 / (sqrt(x^2 + 1.0) + 1.0))
 
-for i in 1:32
+for i in 1:10
     x = 8.0^(-i)
-    println("f(8^(-$i)) = $(f(x))")
-    println("g(8^(-$i)) = $(g(x))\n")
+    print("\$8^{-$i}\$ & \$$(f(x))\$ & ")
+    println("\$$(g(x))\$ \\\\")
 end
