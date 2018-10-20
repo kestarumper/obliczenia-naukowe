@@ -1,5 +1,8 @@
+# @author Adrian Mucha
 """
-@author Adrian Mucha
+Calculates machine epsilon.
+# Arguments
+- `dataType`: daata type for which epsilon should be computed.
 """
 function machEps(dataType)
     epsilon = dataType(1)
@@ -10,6 +13,9 @@ function machEps(dataType)
     return epsilon
 end
 
+"""
+Calculates smallest positive number for specified `dataType`
+"""
 function myEta(dataType)
     x = dataType(1)
     while x / 2 != 0
@@ -18,6 +24,9 @@ function myEta(dataType)
     return x
 end
 
+"""
+Calculates biggest number for specified `dataType`
+"""
 function MAX(dataType)
     x = dataType(1)
     while isinf(x * dataType(2.0)) == false

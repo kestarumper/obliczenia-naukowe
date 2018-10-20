@@ -1,12 +1,17 @@
+# @author Adrian Mucha
+
 """
-@author Adrian Mucha
+Calculates approximated value of a derivative of given function `func`
+in given point `x0` with precision to 2.0^{-n}.
 """
-# using Plots
 function derivative(func::Function, x0::Float64 = 1.0, n::Int = 28)
     h = 2.0^(-n)
     return (func(x0 + h) - f(x0)) / h
 end
 
+"""
+Prints truples (a, b, c) and formats them for Latex use.
+"""
 function printTruplets(truplets)
     for trup in truplets
         print(rpad("\$2^{-$(trup[1])}\$ & \$", 8))

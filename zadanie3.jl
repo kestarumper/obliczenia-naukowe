@@ -1,5 +1,7 @@
+# @author Adrian Mucha
 """
-@author Adrian Mucha
+Prints some amount of binary representation numbers in range [`from` : `to`]
+with step = δ
 """
 function floatNumberStep(from::Float64, to::Float64, δ::Float64)
     println("\nRange [$from:$to)")

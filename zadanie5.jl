@@ -1,9 +1,10 @@
-"""
-@author Adrian Mucha
-"""
+# @author Adrian Mucha
 x = [2.718281828, -3.141592654, 1.414213562, 0.5772156649, 0.3010299957]
 y = [1486.2497, 878366.9879, -22.37492, 4773714.647, 0.000185049]
 
+"""
+Calculates dot product of two vectors.
+"""
 function forwardSum(a, b, n, dataType)
     S = dataType(0.0)
     for i in 1:n
@@ -14,6 +15,9 @@ function forwardSum(a, b, n, dataType)
     return S
 end
 
+"""
+Calculates dot product of two vectors with reversed precendence.
+"""
 function reverseSum(a, b, n, dataType)
     S = dataType(0.0)
     i = n
@@ -24,6 +28,10 @@ function reverseSum(a, b, n, dataType)
     return S
 end
 
+"""
+Calculates dot product of two vectors with sorted values of
+a⋅b then summed according to given sorting type.
+"""
 function sumPositiveNegative(a, b, dataType, reverse=true)
     s_plus = dataType(0.0)
     s_minus = dataType(0.0)

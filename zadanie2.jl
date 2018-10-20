@@ -1,5 +1,7 @@
+# @author Adrian Mucha
+
 """
-@author Adrian Mucha
+Calculates machine epsilon using Kahan theorem.
 """
 function kahanMachEps(dataType)
     a = dataType(3.0)
