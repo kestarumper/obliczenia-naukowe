@@ -1,6 +1,12 @@
 # @author Adrian Mucha
-x = [2.718281828, -3.141592654, 1.414213562, 0.5772156649, 0.301029995]
-y = [1486.2497, 878366.9879, -22.37492, 4773714.647, 0.00018504]
+x =     [2.718281828, -3.141592654, 1.414213562, 0.5772156649, 0.3010299957]
+xd =    [2.718281828, -3.141592654, 1.414213562, 0.577215664, 0.301029995]
+y =     [1486.2497, 878366.9879, -22.37492, 4773714.647, 0.000185049]
+
+println("x4  = ", bits(Float32(x[4])))
+println("x'4 = ", bits(Float32(xd[4])))
+println("x5  = ", bits(Float32(x[5])))
+println("x'5 = ", bits(Float32(xd[5])))
 
 """
 Calculates dot product of two vectors.
@@ -53,10 +59,10 @@ end
 DATATYPES = [Float32, Float64]
 
 for dtype in DATATYPES
-    fs = forwardSum(x, y, 5, dtype)
-    rs = reverseSum(x, y, 5, dtype)
-    spn = sumPositiveNegative(x, y, dtype)
-    spnr = sumPositiveNegative(x, y, dtype, false)
+    fs = (forwardSum(x, y, 5, dtype), forwardSum(xd, y, 5, dtype))
+    rs = (reverseSum(x, y, 5, dtype), reverseSum(xd, y, 5, dtype))
+    spn = (sumPositiveNegative(x, y, dtype), sumPositiveNegative(xd, y, dtype))
+    spnr = (sumPositiveNegative(x, y, dtype, false), sumPositiveNegative(xd, y, dtype, false))
     println("\n$dtype")
     println("Forward Sum: $fs")
     println("Reverse Sum: $rs")
