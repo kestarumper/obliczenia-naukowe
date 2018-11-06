@@ -20,6 +20,6 @@ function floatNumberStep(from::Float64, to::Float64, δ::Float64)
     end
 end
 
-floatNumberStep(0.5, 1.0, 2.0^(-52))
+floatNumberStep(0.5, 1.0, 2.0^(-53))
 floatNumberStep(1.0, 2.0, 2.0^(-52))
-floatNumberStep(2.0, 4.0, 2.0^(-52))
+floatNumberStep(2.0, 4.0, 2.0^(-51))

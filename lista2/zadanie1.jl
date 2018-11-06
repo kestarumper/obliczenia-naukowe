@@ -1,6 +1,6 @@
 # @author Adrian Mucha
-x = [2.718281828, -3.141592654, 1.414213562, 0.5772156649, 0.3010299957]
-y = [1486.2497, 878366.9879, -22.37492, 4773714.647, 0.000185049]
+x = [2.718281828, -3.141592654, 1.414213562, 0.5772156649, 0.301029995]
+y = [1486.2497, 878366.9879, -22.37492, 4773714.647, 0.00018504]
 
 """
 Calculates dot product of two vectors.
@@ -35,9 +35,9 @@ a⋅b then summed according to given sorting type.
 function sumPositiveNegative(a, b, dataType, reverse=true)
     s_plus = dataType(0.0)
     s_minus = dataType(0.0)
-    v = zeros(5)
+    v = dataType[]
     for i in 1:5
-        v[i] = dataType(a[i])*dataType(b[i])
+        push!(v, dataType(dataType(a[i])*dataType(b[i])))
     end
     sort!(v, rev=reverse)
     for val in v
