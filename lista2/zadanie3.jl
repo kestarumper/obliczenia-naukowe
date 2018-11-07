@@ -3,9 +3,22 @@ include(joinpath(@__DIR__,"matcond.jl"))
 
 function relErr(x::AbstractVector, xtild::AbstractVector)
     h = x - xtild
-    normDiff = norm(h)
-    xnorm = norm(x)
-    return normDiff / xnorm
+    normDiff = Float64(norm(h))
+    xnorm = Float64(norm(x))
+    return Float64(normDiff / xnorm)
+end
+
+function printAsTexTable(tuptup)
+    for tup in tuptup
+        len = length(tup)
+        print(tup[1])
+        if(len > 1)
+            for i in 2:len
+                print(" & ", tup[i])
+            end
+        end
+        println(" \\\\")
+    end
 end
 
 println("Hilbert")
