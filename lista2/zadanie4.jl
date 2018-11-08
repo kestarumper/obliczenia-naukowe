@@ -1,4 +1,5 @@
 using Polynomials
+include(joinpath(@__DIR__,"printAsTexTable.jl"))
 
 function evalPolynomials(cfs)
       coefficients = reverse(cfs)
@@ -7,11 +8,13 @@ function evalPolynomials(cfs)
       pierwiastki = roots(P)
 
       pad = 26
+      dataSet = []
       for k in 20:-1:1
             zk = pierwiastki[20 - k + 1]
             valP = abs(P(zk))
             valp = abs(p(zk))
             h = abs(zk - k)
+            push!(dataSet, (20 - k + 1, zk, valP, valp, h))
             println(
                   rpad("|P($zk)|", pad),
                   rpad("= $valP", pad),
@@ -21,6 +24,7 @@ function evalPolynomials(cfs)
                   "= $h"
             )
       end
+      return dataSet
 end
 
 cfnts = [1, -210.0, 20615.0,-1256850.0,
@@ -33,7 +37,10 @@ cfnts = [1, -210.0, 20615.0,-1256850.0,
       13803759753640704000.0,      -8752948036761600000.0,
       2432902008176640000.0]
 println("")
-evalPolynomials(cfnts)
+a = evalPolynomials(cfnts)
 println("Change -210 → -210-2^{-23}")
 cfnts[2] = -210 - 2.0^(-23)
-evalPolynomials(cfnts)
+b = evalPolynomials(cfnts)
+
+# printAsTexTable(a)
+# printAsTexTable(b)

@@ -8,22 +8,10 @@ function relErr(x::AbstractVector, xtild::AbstractVector)
     return Float64(normDiff / xnorm)
 end
 
-function printAsTexTable(tuptup)
-    for tup in tuptup
-        len = length(tup)
-        print(tup[1])
-        if(len > 1)
-            for i in 2:len
-                print(" & ", tup[i])
-            end
-        end
-        println(" \\\\")
-    end
-end
-
 println("Hilbert")
 hilbertResults = []
-for i in 1:18
+sumError = [0.0, 0.0]
+for i in 1:50
     A = hilb(i)
     x = ones(Float64, (size(A)[1]))
     b = A*x
@@ -36,6 +24,8 @@ for i in 1:18
     matrixRnk = rank(A)
 
     push!(hilbertResults, (i, errGauss, errInv, matrixCond, matrixRnk))
+    sumError[1] = sumError[1] + errGauss
+    sumError[2] = sumError[2] + errInv
     pad = 30
     println(
         lpad("Hn[$i×$i] ", 20),
@@ -45,6 +35,7 @@ for i in 1:18
         rpad("Rank: $matrixRnk", pad)
     )
 end
+println(sumError)
 
 println("\nRandom")
 narr = [5, 10, 20]

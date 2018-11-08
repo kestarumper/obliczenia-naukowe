@@ -21,10 +21,13 @@ inputPairs = [
 dataset = []
 counter = 1
 for pair in inputPairs
-    push!(dataset, [])
+    println("")
+    println(pair)
+    push!(dataset, Float64[])
     for i in 1:40
         push!(dataset[counter], iterate(i, pair[2], pair[1], Float64))
     end
+    println(dataset[counter])
     plt = plot(dataset[counter])
     png(plt, "plot_$counter.png")
     counter += 1

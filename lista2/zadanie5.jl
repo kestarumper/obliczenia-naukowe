@@ -1,4 +1,4 @@
-
+include(joinpath(@__DIR__,"printAsTexTable.jl"))
 
 function iterPopGrowthModel(n, dt, rnding = false)
     p0 = dt(0.01)
@@ -13,20 +13,19 @@ function iterPopGrowthModel(n, dt, rnding = false)
     return pn
 end
 
-function experiment1()
+function experiment12()
+    dataSet = []
+    println("\t", "Float32Trunc", "\t", Float32, "\t\t", Float64)
     for i in 1:40
-        println(i, "\t", iterPopGrowthModel(i, Float32, true))
-    end
-end
-
-function experiment2()
-    println("\t", Float32, "\t\t", Float64)
-    for i in 1:40
+        f32_trunc = iterPopGrowthModel(i, Float32, true)
         f32 = iterPopGrowthModel(i, Float32)
         f64 = iterPopGrowthModel(i, Float64)
-        println(i, "\t", f32, "\t", f64)
+        push!(dataSet, (i, f32_trunc, f32, f64))
+        println(i, "\t", f32_trunc, "\t", f32, "\t", f64)
     end
+    return dataSet
 end
 
-experiment1()
-experiment2()
+ds = experiment12()
+
+# printAsTexTable(ds)
