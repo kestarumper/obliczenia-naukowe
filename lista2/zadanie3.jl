@@ -1,6 +1,10 @@
+# @author Adrian Mucha
 include(joinpath(@__DIR__,"hilb.jl"))
 include(joinpath(@__DIR__,"matcond.jl"))
 
+"""
+Calculates relative error of 2 vectors
+"""
 function relErr(x::AbstractVector, xtild::AbstractVector)
     h = x - xtild
     normDiff = Float64(norm(h))

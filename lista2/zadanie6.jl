@@ -1,5 +1,13 @@
+# @author Adrian Mucha
 using Plots
 
+"""
+Calculates x_{n+1} = (x_{n})^2 - c
+by iterating; starts from x0, 
+@inpit x0 - starting value
+@input c - modifier
+@inpit dt - data type.
+"""
 function iterate(n, x0, c, dt)
     result = dt(x0)
     for i in 1:n

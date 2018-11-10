@@ -1,5 +1,12 @@
+# @author Adrian Mucha
 include(joinpath(@__DIR__,"printAsTexTable.jl"))
 
+"""
+Calculates n'th logistic function (population growth function) iteration.
+@input n - desired iteration to be calculated
+@input dt - data type the calculations should be in
+@input rnding - specify if 10th iteration should be truncated to 3rd digits
+"""
 function iterPopGrowthModel(n, dt, rnding = false)
     p0 = dt(0.01)
     r = dt(3)
@@ -13,6 +20,10 @@ function iterPopGrowthModel(n, dt, rnding = false)
     return pn
 end
 
+"""
+Performs experiment, calculating iterPopGrowthModel() function
+for different n values, different modes and different data types.
+"""
 function experiment12()
     dataSet = []
     println("\t", "Float32Trunc", "\t", Float32, "\t\t", Float64)

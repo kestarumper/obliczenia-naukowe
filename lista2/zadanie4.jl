@@ -1,6 +1,13 @@
+# @author Adrian Mucha
 using Polynomials
 include(joinpath(@__DIR__,"printAsTexTable.jl"))
 
+"""
+Evaluates polynomial created from coefficients using 'Poly'
+function with wilkinson polynomial created with 'poly' function
+from module 'Polynomials'. Polynomials are evaluated at roots calculated
+by 'roots' function.
+"""
 function evalPolynomials(cfs)
       coefficients = reverse(cfs)
       P = Poly(coefficients)
