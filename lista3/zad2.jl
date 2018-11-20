@@ -26,6 +26,7 @@ function mstycznych(f,pf,x0::Float64, delta::Float64, epsilon::Float64, maxit::I
         return (x0, v, 0, 1)
     end
     x1 = 0
+    k = 0
     for k in 1:maxit
         x1 = x0 - v / pf(x0)
         v = f(x1)
