@@ -1,4 +1,4 @@
-push!(LOAD_PATH, "/home/adrian/obliczenia-naukowe/lista3/")
+push!(LOAD_PATH, ".")
 using RootsModule
 
 y(x) = 3x - exp(x)

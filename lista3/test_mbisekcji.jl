@@ -1,3 +1,4 @@
+push!(LOAD_PATH, ".")
 using RootsModule
 
 f(x) = (x - 11)*(x - 23)

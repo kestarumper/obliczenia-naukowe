@@ -1,4 +1,4 @@
-push!(LOAD_PATH, "/home/adrian/obliczenia-naukowe/lista3/")
+push!(LOAD_PATH, ".")
 using RootsModule
 
 fsin(x) = sin(x) - (0.5x)^2
