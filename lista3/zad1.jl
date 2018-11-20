@@ -1,3 +1,21 @@
+"""
+Opis:
+Funkcja oblicza pierwiastki funkcji używając metody bisekcji.
+
+Dane:
+f – funkcja f(x) zadana jako anonimowa funkcja (ang. anonymous function),
+a,b – końce przedziału początkowego,
+delta,epsilon – dokładności obliczeń,
+
+Wyniki:
+(r,v,it,err) – czwórka, gdzie
+r – przybliżenie pierwiastka równania f(x) = 0,
+v – wartość f(r),
+it – liczba wykonanych iteracji,
+err – sygnalizacja błędu
+    0 - brak błędu
+    1 - funkcja nie zmienia znaku w przedziale [a,b]
+"""
 function mbisekcji(f, a::Float64, b::Float64, delta::Float64, epsilon::Float64)
     it = 0
     u = f(a)
