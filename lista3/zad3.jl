@@ -1,3 +1,4 @@
+#author Adrian Mucha
 """
 Opis:
 Funkcja oblicza pierwiastki funkcji używając metody siecznych.

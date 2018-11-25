@@ -1,3 +1,4 @@
+#author Adrian Mucha
 module RootsModule
 
 include("zad1.jl")
