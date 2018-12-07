@@ -20,8 +20,3 @@ function warNewton(x::Vector{Float64}, fx::Vector{Float64}, t::Float64)
     end
     return nt
 end
-
-x = Float64[5, -7, -6, 0]
-y = Float64[1, 2, 3, 4]
-
-println(warNewton(x, y, 0.0))
