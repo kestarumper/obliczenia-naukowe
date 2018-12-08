@@ -7,8 +7,4 @@ fx = Float64[1, 2, 3, 4]
 @testset "Testy jednostkowe funkcji naturalna" begin
     @test Ilorazy.naturalna(x, fx) ≈ [-954.0, -84.0, 35.0, 4.0]
     @test Ilorazy.naturalna([-2.0], [4.0]) ≈ [4.0]
-    @test Ilorazy.naturalna(
-        [-4.0, -2.0, -1.0, 0.0, 1.0, 2.0, 4.0],
-        [16.0, 4.0, 1.0, 0.0, 1.0, 4.0, 16.0],
-    ) ≈ zeros(7)
 end
