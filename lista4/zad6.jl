@@ -2,11 +2,12 @@ push!(LOAD_PATH, ".")
 using Ilorazy
 
 ns = [5, 10, 15]
-func(x) = x^2*sin(x)
+f1(x) = abs(x)
+f2(x) = 1.0 / ( 1.0 + x^2 )
 
 testCases = [
-    (exp, 0.0, 1.0, "exp")
-    (func, -1.0, 1.0, "x2sinx")
+    (f1, -1.0, 1.0, "|x|")
+    (f2, -5.0, 5.0, "1div(1_plus_x2)")
 ]
 
 for tc in testCases
