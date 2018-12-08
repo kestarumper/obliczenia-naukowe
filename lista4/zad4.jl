@@ -20,9 +20,3 @@ function rysujNnfx(f, a::Float64, b::Float64, n::Int)
     png(plt, "plot.png")
     return (x, y, fx, fy)
 end
-
-func(x) = x^2
-a = 0.0
-b = 3.14
-
-(x, y, fx, fy) = rysujNnfx(func, a, b, 50)
