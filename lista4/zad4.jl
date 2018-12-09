@@ -1,3 +1,4 @@
+# @author Adrian Mucha
 push!(LOAD_PATH, ".")
 using Ilorazy
 using Plots

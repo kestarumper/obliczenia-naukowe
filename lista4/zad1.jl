@@ -1,3 +1,4 @@
+# @author Adrian Mucha
 """
 # Dane
     x - wektor długości n+1 zawierający węzły x0,...,xn

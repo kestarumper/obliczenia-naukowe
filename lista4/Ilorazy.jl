@@ -1,3 +1,4 @@
+# @author Adrian Mucha
 module Ilorazy
 
 include("zad1.jl")
