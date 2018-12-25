@@ -67,6 +67,7 @@ module Blocksys
 
     function gaussElimination(n::Int, A::SparseMatrixCSC{Float64, Int}, b::Array{Float64, 1}, p = 1:n)
         a = deepcopy(A)
+        b = deepcopy(b)
         for k in 1:n-1
             for i in k+1:n
                 z = a[p[i], k] / a[p[k], k]
@@ -82,17 +83,16 @@ module Blocksys
 
     function gaussEliminationSpecific(n::Int, A::SparseMatrixCSC{Float64, Int}, b::Array{Float64, 1}, l::Int, p = 1:n)
         a = deepcopy(A)
+        b = deepcopy(b)
         for k in 1:n-1
             lastRow = min(n, Int(l + l * floor(k / l))) # calculate zeroing range
             for i in k+1:lastRow
                 z = a[p[i], k] / a[p[k], k] # multiplier
-
-                a[p[i], k] = 0
-                b[p[i]] -= z * b[p[k]]
-
+                a[p[i], k] = 0  # eliminate under diagonal
+                b[p[i]] -= z * b[p[k]]  # modify right side vector
                 lastColumn = min(n, Int(i + l)) # calculate modyfing range
                 for j in k+1:lastColumn
-                    a[p[i], j] -= z * a[p[k], j]
+                    a[p[i], j] -= z * a[p[k], j]    # modify current row
                 end
             end
         end
