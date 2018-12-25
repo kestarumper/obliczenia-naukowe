@@ -22,7 +22,7 @@ module Blocksys
         idx = 1
         for i in p
             for j=1:n
-                print_with_color(array[i, j] == 0.0 ? :default : j >= idx ? :blue : :red, @sprintf("%8.3f", array[i,j]))
+                print_with_color(array[i, j] == 0.0 ? :default : j >= idx ? :blue : :yellow, @sprintf("%8.3f", array[i,j]))
             end
             idx += 1
             println("")
@@ -81,22 +81,28 @@ module Blocksys
         return a, b
     end
 
+    function partialChoice(n::Int, A::SparseMatrixCSC{Float64, Int})
+        p = 1:n
+        lastRow = min(n, Int(l + l * floor(k / l))) # calculate zeroing range
+
+    end
+
     function gaussEliminationSpecific(n::Int, A::SparseMatrixCSC{Float64, Int}, b::Array{Float64, 1}, l::Int, p = 1:n)
         a = deepcopy(A)
         b = deepcopy(b)
         for k in 1:n-1
             lastRow = min(n, Int(l + l * floor(k / l))) # calculate zeroing range
+            lastColumn = min(n, Int(k + l)) # calculate modyfing range
             for i in k+1:lastRow
                 z = a[p[i], k] / a[p[k], k] # multiplier
                 a[p[i], k] = 0  # eliminate under diagonal
                 b[p[i]] -= z * b[p[k]]  # modify right side vector
-                lastColumn = min(n, Int(i + l)) # calculate modyfing range
                 for j in k+1:lastColumn
                     a[p[i], j] -= z * a[p[k], j]    # modify current row
                 end
             end
         end
-        return a, b
+        return a, b, p
     end
 end
 
