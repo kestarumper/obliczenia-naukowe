@@ -81,19 +81,25 @@ module Blocksys
         return a, b
     end
 
-    function partialChoice(n::Int, A::SparseMatrixCSC{Float64, Int})
-        p = 1:n
-        lastRow = min(n, Int(l + l * floor(k / l))) # calculate zeroing range
-
-    end
-
-    function gaussEliminationSpecific(n::Int, A::SparseMatrixCSC{Float64, Int}, b::Array{Float64, 1}, l::Int, p = 1:n)
+    function gaussEliminationSpecific(n::Int, A::SparseMatrixCSC{Float64, Int}, b::Array{Float64, 1}, l::Int, choice::Bool = false)
+		p = collect(1:n)
         a = deepcopy(A)
         b = deepcopy(b)
         for k in 1:n-1
-            lastRow = min(n, Int(l + l * floor(k / l))) # calculate zeroing range
-            lastColumn = min(n, Int(k + l)) # calculate modyfing range
+			lastColumn = min(n, Int64(2l + l * floor(k / l))) # calculate modyfing range
+            lastRow = min(n, Int64(l + l * floor(k / l))) # calculate zeroing range
             for i in k+1:lastRow
+				if choice
+					maxRow = k
+					max = abs(A[p[k], k])
+					for x in i : lastRow
+						if (abs(A[p[x], k]) > max)
+							maxRow = x;
+							max = abs(A[p[x], k])
+						end
+					end
+					p[k], p[maxRow] = p[maxRow], p[k]
+				end
                 z = a[p[i], k] / a[p[k], k] # multiplier
                 a[p[i], k] = 0  # eliminate under diagonal
                 b[p[i]] -= z * b[p[k]]  # modify right side vector
@@ -102,7 +108,17 @@ module Blocksys
                 end
             end
         end
-        return a, b, p
+		
+		x = zeros(n)
+        for i in n:-1:1
+			lastColumn = min(n, Int64(2l + l * floor(p[i] / l)))
+            s = b[p[i]]
+            for j in (i+1):lastColumn
+                s -= a[p[i], j] * x[j]
+            end
+            x[i] = s / a[p[i], i]
+        end
+        return a, b, p, x
     end
 end
 
@@ -153,8 +169,17 @@ end
     vecFile_16_b = "$(pwd())/Dane16_1_1/b.txt"
     A, n, l = loadMatFromFile(matFile_16_A)
     b = loadVecFromFile(vecFile_16_b)
-    A, b = gaussEliminationSpecific(n, A, b, l)
+    A, b, p, x = gaussEliminationSpecific(n, A, b, l)
     printSparse(A, n)
-    x = backwardSubstitution(n, A, b)
+    @test x ≈ ones(Float64, n)
+end
+
+@testset "Solve with Gaussian Elimination SPECIFIC with CHOICE" begin
+    matFile_16_A = "$(pwd())/Dane16_1_1/A.txt"
+    vecFile_16_b = "$(pwd())/Dane16_1_1/b.txt"
+    A, n, l = loadMatFromFile(matFile_16_A)
+    b = loadVecFromFile(vecFile_16_b)
+    A, b, p, x = gaussEliminationSpecific(n, A, b, l, true)
+    printSparse(A, n, p)
     @test x ≈ ones(Float64, n)
 end
