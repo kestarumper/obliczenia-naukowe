@@ -82,7 +82,7 @@ module Blocksys
         return a, b, x
     end
 
-    function gaussEliminationSpecific(n::Int, A::SparseMatrixCSC{Float64, Int}, b::Array{Float64, 1}, l::Int, choice::Bool = false)
+    function gaussEliminationSpecific(n::Int, A::SparseMatrixCSC{Float64, Int}, b::Array{Float64, 1}, l::Int, choice::Bool = false, buildLU::Bool = false)
 		p = collect(1:n)
         a = deepcopy(A)
         b = deepcopy(b)
@@ -102,7 +102,11 @@ module Blocksys
 					p[k], p[maxRow] = p[maxRow], p[k]
 				end
                 z = a[p[i], k] / a[p[k], k] # multiplier
-                a[p[i], k] = 0  # eliminate under diagonal
+				if buildLU
+					a[p[i], k] = z	# save multipliers for LU
+				else
+					a[p[i], k] = 0  # eliminate under diagonal
+				end
                 b[p[i]] -= z * b[p[k]]  # modify right side vector
                 for j in k+1:lastColumn
                     a[p[i], j] -= z * a[p[k], j]    # modify current row
@@ -154,32 +158,30 @@ end
     @test x ≈ Float64[1, -3, -2, 1]
 end
 
+matFile_16_A = "$(pwd())/Dane16_1_1/A.txt"
+vecFile_16_b = "$(pwd())/Dane16_1_1/b.txt"
+ORIGINAL_A, n, l = loadMatFromFile(matFile_16_A)
+printSparse(ORIGINAL_A, n)
+ORIGINAL_b = loadVecFromFile(vecFile_16_b)
+
 @testset "Solve with standard Gauss Elimination" begin
-    matFile_16_A = "$(pwd())/Dane16_1_1/A.txt"
-    vecFile_16_b = "$(pwd())/Dane16_1_1/b.txt"
-    A, n, l = loadMatFromFile(matFile_16_A)
-    printSparse(A, n)
-    b = loadVecFromFile(vecFile_16_b)
-    A, b, x = gaussElimination(n, A, b)
+    A, b, x = gaussElimination(n, ORIGINAL_A, ORIGINAL_b)
     @test x ≈ ones(Float64, n)
 end
 
 @testset "Solve with Gaussian Elimination SPECIFIC" begin
-    matFile_16_A = "$(pwd())/Dane16_1_1/A.txt"
-    vecFile_16_b = "$(pwd())/Dane16_1_1/b.txt"
-    A, n, l = loadMatFromFile(matFile_16_A)
-    b = loadVecFromFile(vecFile_16_b)
-    A, b, p, x = gaussEliminationSpecific(n, A, b, l)
+    A, b, p, x = gaussEliminationSpecific(n, ORIGINAL_A, ORIGINAL_b, l)
     printSparse(A, n)
     @test x ≈ ones(Float64, n)
 end
 
 @testset "Solve with Gaussian Elimination SPECIFIC with CHOICE" begin
-    matFile_16_A = "$(pwd())/Dane16_1_1/A.txt"
-    vecFile_16_b = "$(pwd())/Dane16_1_1/b.txt"
-    A, n, l = loadMatFromFile(matFile_16_A)
-    b = loadVecFromFile(vecFile_16_b)
-    A, b, p, x = gaussEliminationSpecific(n, A, b, l, true)
+    A, b, p, x = gaussEliminationSpecific(n, ORIGINAL_A, ORIGINAL_b, l, true)
     printSparse(A, n, p)
     @test x ≈ ones(Float64, n)
+end
+
+@testset "Build LU matrix" begin
+	A, b, p, x = gaussEliminationSpecific(n, ORIGINAL_A, ORIGINAL_b, l, true, true)
+	printSparse(A, n, p)
 end
