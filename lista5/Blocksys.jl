@@ -53,11 +53,15 @@ module Blocksys
         return b
     end
 
-    function backwardSubstitution(n::Int64, a::SparseMatrixCSC{Float64, Int64}, b::Array{Float64, 1}, p = 1:n)
+    function backwardSubstitution(n::Int64, a::SparseMatrixCSC{Float64, Int64}, b::Array{Float64, 1}, p = 1:n, l::Int = 0)
         x = zeros(n)
         for i in n:-1:1
+			lastColumn = n
+			if l > 0
+				lastColumn = min(n, Int(2l + l * floor(p[i] / l)))
+			end
             s = b[p[i]]
-            for j in (i+1):n
+            for j in (i+1):lastColumn
                 s -= a[p[i], j] * x[j]
             end
             x[i] = s / a[p[i], i]
@@ -114,15 +118,7 @@ module Blocksys
             end
         end
 
-		x = zeros(n)
-        for i in n:-1:1
-			lastColumn = min(n, Int64(2l + l * floor(p[i] / l)))
-            s = b[p[i]]
-            for j in (i+1):lastColumn
-                s -= a[p[i], j] * x[j]
-            end
-            x[i] = s / a[p[i], i]
-        end
+		x = backwardSubstitution(n, a, b, p, l)
         return a, b, p, x
     end
 end
