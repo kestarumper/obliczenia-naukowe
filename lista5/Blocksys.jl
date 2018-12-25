@@ -18,7 +18,7 @@ module Blocksys
         return split(readline(f))
     end
 
-    function printSparse(array::SparseMatrixCSC{Float64, Int64}, n, p=[1:n;])
+    function printSparse(array::SparseMatrixCSC{Float64, Int64}, n, p=1:n)
         idx = 1
         for i in p
             for j=1:n
@@ -107,7 +107,7 @@ module Blocksys
 					p[k], p[maxRow] = p[maxRow], p[k]
 				end
 				if eps(Float64) > abs(a[p[k], k])
-					error("Singular matrix")
+					error("Zero on diagonall")
 				end
                 z = a[p[i], k] / a[p[k], k] # multiplier
 				if buildLU
@@ -125,6 +125,37 @@ module Blocksys
 		x = backwardSubstitution(n, a, b, p, l)
         return a, b, p, x
     end
+
+	function buildLU(n::Int, A::SparseMatrixCSC{Float64, Int}, l::Int, choice::Bool = false)
+		p = collect(1:n)
+        a = deepcopy(A)
+        for k in 1:n-1
+			lastColumn = min(n, Int64(2l + l * floor(k / l))) # calculate modyfing range
+            lastRow = min(n, Int64(l + l * floor(k / l))) # calculate zeroing range
+            for i in k+1:lastRow
+				if choice
+					maxRow = k
+					max = abs(a[p[k], k])
+					for x in i : lastRow
+						if (abs(a[p[x], k]) > max)
+							maxRow = x;
+							max = abs(a[p[x], k])
+						end
+					end
+					p[k], p[maxRow] = p[maxRow], p[k]
+				end
+				if eps(Float64) > abs(a[p[k], k])
+					error("Zero on diagonall")
+				end
+                z = a[p[i], k] / a[p[k], k] # multiplier
+				a[p[i], k] = z	# save multipliers for LU
+                for j in k+1:lastColumn
+                    a[p[i], j] -= z * a[p[k], j]    # modify current row
+                end
+            end
+        end
+        return a, p
+	end
 end
 
 using Blocksys
@@ -171,18 +202,18 @@ ORIGINAL_b = loadVecFromFile(vecFile_16_b)
 # 	end
 # end
 
-# @testset "Normal" begin
-# 	@testset "Solve with Gaussian Elimination SPECIFIC" begin
-# 		A, b, p, x = gaussEliminationSpecific(n, ORIGINAL_A, ORIGINAL_b, l)
-# 		printSparse(A, n)
-# 		@test x ≈ ones(Float64, n)
-# 	end
-#
-# 	@testset "Build LU matrix" begin
-# 		A, b, p, x = gaussEliminationSpecific(n, ORIGINAL_A, ORIGINAL_b, l, false, true)
-# 		printSparse(A, n, p)
-# 	end
-# end
+@testset "Normal" begin
+	@testset "Solve with Gaussian Elimination SPECIFIC" begin
+		A, b, p, x = gaussEliminationSpecific(n, ORIGINAL_A, ORIGINAL_b, l)
+		printSparse(A, n)
+		@test x ≈ ones(Float64, n)
+	end
+
+	@testset "Build LU matrix" begin
+		A, b, p, x = gaussEliminationSpecific(n, ORIGINAL_A, ORIGINAL_b, l, false, true)
+		printSparse(A, n, p)
+	end
+end
 
 @testset "With CHOICE" begin
 	@testset "Solve with Gaussian Elimination SPECIFIC with CHOICE" begin
