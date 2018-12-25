@@ -78,7 +78,8 @@ module Blocksys
                 end
             end
         end
-        return a, b
+		x = backwardSubstitution(n, a, b)
+        return a, b, x
     end
 
     function gaussEliminationSpecific(n::Int, A::SparseMatrixCSC{Float64, Int}, b::Array{Float64, 1}, l::Int, choice::Bool = false)
@@ -108,7 +109,7 @@ module Blocksys
                 end
             end
         end
-		
+
 		x = zeros(n)
         for i in n:-1:1
 			lastColumn = min(n, Int64(2l + l * floor(p[i] / l)))
@@ -159,8 +160,7 @@ end
     A, n, l = loadMatFromFile(matFile_16_A)
     printSparse(A, n)
     b = loadVecFromFile(vecFile_16_b)
-    A, b = gaussElimination(n, A, b)
-    x = backwardSubstitution(n, A, b)
+    A, b, x = gaussElimination(n, A, b)
     @test x ≈ ones(Float64, n)
 end
 
