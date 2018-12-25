@@ -1,5 +1,10 @@
 module Blocksys
-    export loadMatFromFile, loadVecFromFile, printSparse, backwardSubstitution, gaussElimination, gaussEliminationSpecific
+    export loadMatFromFile,
+            loadVecFromFile,
+            printSparse,
+            backwardSubstitution,
+            gaussElimination,
+            gaussEliminationSpecific
 
     function parseInt(x)
         return parse(Int, x)
@@ -130,11 +135,11 @@ end
     matFile_16_A = "$(pwd())/Dane16_1_1/A.txt"
     vecFile_16_b = "$(pwd())/Dane16_1_1/b.txt"
     A, n, l = loadMatFromFile(matFile_16_A)
-    printSparse(A, 16)
+    printSparse(A, n)
     b = loadVecFromFile(vecFile_16_b)
-    A, b = gaussElimination(16, A, b)
-    x = backwardSubstitution(16, A, b)
-    @test x ≈ ones(Float64, 16)
+    A, b = gaussElimination(n, A, b)
+    x = backwardSubstitution(n, A, b)
+    @test x ≈ ones(Float64, n)
 end
 
 @testset "Solve with Gaussian Elimination SPECIFIC" begin
@@ -142,8 +147,8 @@ end
     vecFile_16_b = "$(pwd())/Dane16_1_1/b.txt"
     A, n, l = loadMatFromFile(matFile_16_A)
     b = loadVecFromFile(vecFile_16_b)
-    A, b = gaussEliminationSpecific(16, A, b, l)
-    printSparse(A, 16)
-    x = backwardSubstitution(16, A, b)
-    @test x ≈ ones(Float64, 16)
+    A, b = gaussEliminationSpecific(n, A, b, l)
+    printSparse(A, n)
+    x = backwardSubstitution(n, A, b)
+    @test x ≈ ones(Float64, n)
 end
