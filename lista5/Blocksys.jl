@@ -4,7 +4,9 @@ module Blocksys
             printSparse,
             backwardSubstitution,
             gaussElimination,
-            gaussEliminationSpecific
+            gaussEliminationSpecific,
+			buildLU,
+			solveLU
 
     function parseInt(x)
         return parse(Int, x)
@@ -156,6 +158,17 @@ module Blocksys
         end
         return a, p
 	end
+
+	function solveLU(n::Int, a::SparseMatrixCSC{Float64, Int}, b::Array{Float64, 1}, l::Int, p = 1:n)
+		b = deepcopy(b)
+		for k in 1:(n-1)
+			lastRow = min(n, Int64(l + l * floor(k / l)))
+			for i in (k+1):lastRow
+				b[p[i]] -= a[p[i], k] * b[p[k]]
+			end
+		end
+		return backwardSubstitution(n, a, b, p, l)
+	end
 end
 
 using Blocksys
@@ -225,5 +238,11 @@ end
 	@testset "Build LU matrix" begin
 		A, b, p, x = gaussEliminationSpecific(n, ORIGINAL_A, ORIGINAL_b, l, true, true)
 		printSparse(A, n, p)
+	end
+
+	@testset "Solve LU" begin
+		A, p = buildLU(n, ORIGINAL_A, l, true)
+		x = solveLU(n, A, ORIGINAL_b, l, p)
+		@test x ≈ ones(n)
 	end
 end
