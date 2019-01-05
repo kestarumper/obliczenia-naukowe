@@ -21,7 +21,6 @@ module Blocksys
     end
 
     function printSparse(array::SparseMatrixCSC{Float64, Int64}, n, p=1:n)
-		return
         idx = 1
         for i in p
             for j=1:n
@@ -73,6 +72,17 @@ module Blocksys
         return x
     end
 
+	function forwardSubstitution(n::Int64, a::SparseMatrixCSC{Float64, Int64}, b::Array{Float64, 1}, p = 1:n, l::Int = 0)
+		b = deepcopy(b)
+		for k in 1:(n-1)
+			lastRow = min(n, Int64(l + l * floor(k / l)))
+			for i in (k+1):lastRow
+				b[p[i]] -= a[p[i], k] * b[p[k]]
+			end
+		end
+		return b
+	end
+
     function gaussElimination(n::Int, A::SparseMatrixCSC{Float64, Int}, b::Array{Float64, 1}, p = 1:n)
         a = deepcopy(A)
         b = deepcopy(b)
@@ -95,7 +105,6 @@ module Blocksys
         a = deepcopy(A)
         b = deepcopy(b)
         for k in 1:n-1
-			lastColumn = min(n, Int64(2l + l * floor(k / l))) # calculate modyfing range
             lastRow = min(n, Int64(l + l * floor(k / l))) # calculate zeroing range
             for i in k+1:lastRow
 				if choice
@@ -119,6 +128,8 @@ module Blocksys
 					a[p[i], k] = 0  # eliminate under diagonal
 				end
                 b[p[i]] -= z * b[p[k]]  # modify right side vector
+
+				lastColumn = min(n, Int64(2l + l * floor(i / l))) # calculate modyfing range
                 for j in k+1:lastColumn
                     a[p[i], j] -= z * a[p[k], j]    # modify current row
                 end
@@ -133,7 +144,6 @@ module Blocksys
 		p = collect(1:n)
         a = deepcopy(A)
         for k in 1:n-1
-			lastColumn = min(n, Int64(2l + l * floor(k / l))) # calculate modyfing range
             lastRow = min(n, Int64(l + l * floor(k / l))) # calculate zeroing range
             for i in k+1:lastRow
 				if choice
@@ -152,6 +162,8 @@ module Blocksys
 				end
                 z = a[p[i], k] / a[p[k], k] # multiplier
 				a[p[i], k] = z	# save multipliers for LU
+
+				lastColumn = min(n, Int64(2l + l * floor(i / l))) # calculate modyfing range
                 for j in k+1:lastColumn
                     a[p[i], j] -= z * a[p[k], j]    # modify current row
                 end
@@ -161,13 +173,8 @@ module Blocksys
 	end
 
 	function solveLU(n::Int, a::SparseMatrixCSC{Float64, Int}, b::Array{Float64, 1}, l::Int, p = 1:n)
-		b = deepcopy(b)
-		for k in 1:(n-1)
-			lastRow = min(n, Int64(l + l * floor(k / l)))
-			for i in (k+1):lastRow
-				b[p[i]] -= a[p[i], k] * b[p[k]]
-			end
-		end
-		return backwardSubstitution(n, a, b, p, l)
+		z = forwardSubstitution(n, a, b, p, l) # solve lower LU matrix
+		x = backwardSubstitution(n, a, z, p, l) # solve upper LU matrix
+		return x
 	end
 end

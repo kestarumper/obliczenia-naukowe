@@ -32,14 +32,15 @@ println("")
     end
 end
 
-dataFileSizes = ["16", "10000", "50000"]
+# dataFileSizes = ["16", "10000", "50000"]
+dataFileSizes = ["16"]
 for size in dataFileSizes
     @testset "$(lpad("Matrix ∈ $(size)×$(size)", 32))" begin
-        matFile_16_A = "$(pwd())/Dane$(size)_1_1/A.txt"
-        vecFile_16_b = "$(pwd())/Dane$(size)_1_1/b.txt"
-        ORIGINAL_A, n, l = loadMatFromFile(matFile_16_A)
+        matFile_A = "$(pwd())/Dane$(size)_1_1/A.txt"
+        vecFile_b = "$(pwd())/Dane$(size)_1_1/b.txt"
+        ORIGINAL_A, n, l = loadMatFromFile(matFile_A)
         printSparse(ORIGINAL_A, n)
-        ORIGINAL_b = loadVecFromFile(vecFile_16_b)
+        ORIGINAL_b = loadVecFromFile(vecFile_b)
 
         @testset "Specific WITHOUT choice" begin
             @testset "Solve with Gaussian Elimination SPECIFIC" begin
@@ -51,6 +52,7 @@ for size in dataFileSizes
             @testset "Build LU matrix" begin
                 A, b, p, x = gaussEliminationSpecific(n, ORIGINAL_A, ORIGINAL_b, l, false, true)
                 printSparse(A, n, p)
+                @test x ≈ ones(n)
             end
 
             @testset "Solve LU" begin
@@ -61,6 +63,7 @@ for size in dataFileSizes
         end
 
         @testset "Specific with CHOICE" begin
+            println("KAPPA")
             @testset "Solve with Gaussian Elimination SPECIFIC with CHOICE" begin
                 A, b, p, x = gaussEliminationSpecific(n, ORIGINAL_A, ORIGINAL_b, l, true)
                 printSparse(A, n, p)
@@ -70,6 +73,7 @@ for size in dataFileSizes
             @testset "Build LU matrix" begin
                 A, b, p, x = gaussEliminationSpecific(n, ORIGINAL_A, ORIGINAL_b, l, true, true)
                 printSparse(A, n, p)
+                @test x ≈ ones(n)
             end
 
             @testset "Solve LU" begin
