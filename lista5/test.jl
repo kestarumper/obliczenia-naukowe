@@ -42,6 +42,11 @@ for size in dataFileSizes
         printSparse(ORIGINAL_A, n)
         ORIGINAL_b = loadVecFromFile(vecFile_b)
 
+        @testset "Calculate right side vector" begin
+            b = calculateRightSideVector(n, ORIGINAL_A, l)
+            @test b ≈ ORIGINAL_b
+        end
+
         @testset "Specific WITHOUT choice" begin
             @testset "Solve with Gaussian Elimination SPECIFIC" begin
                 A, b, p, x = gaussEliminationSpecific(n, ORIGINAL_A, ORIGINAL_b, l)

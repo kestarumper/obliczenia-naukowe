@@ -6,7 +6,8 @@ module Blocksys
             gaussElimination,
             gaussEliminationSpecific,
 			buildLU,
-			solveLU
+			solveLU,
+			calculateRightSideVector
 
     function parseInt(x)
         return parse(Int, x)
@@ -176,5 +177,17 @@ module Blocksys
 		z = forwardSubstitution(n, a, b, p, l) # solve lower LU matrix
 		x = backwardSubstitution(n, a, z, p, l) # solve upper LU matrix
 		return x
+	end
+
+	function calculateRightSideVector(n::Int, a::SparseMatrixCSC{Float64, Int}, l::Int)
+		b = zeros(n)
+		for row in 1:n
+			colStart = max(Int64(l * floor((row - 1) / l)), 1)
+			colEnd = min(row + l, n)
+			for col in colStart:colEnd
+				b[row] += a[row, col]
+			end
+		end
+		return b
 	end
 end
