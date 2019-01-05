@@ -22,6 +22,9 @@ module Blocksys
     end
 
     function printSparse(array::SparseMatrixCSC{Float64, Int64}, n, p=1:n)
+		if n > 16
+			return
+		end
         idx = 1
         for i in p
             for j=1:n
@@ -62,7 +65,7 @@ module Blocksys
         for i in n:-1:1
 			lastColumn = n
 			if l > 0
-				lastColumn = min(n, Int(2l + l * floor(p[i] / l)))
+				lastColumn = min(n, Int(2l + l * floor((p[i] - 1) / l)))
 			end
             s = b[p[i]]
             for j in (i+1):lastColumn
@@ -130,7 +133,7 @@ module Blocksys
 				end
                 b[p[i]] -= z * b[p[k]]  # modify right side vector
 
-				lastColumn = min(n, Int64(2l + l * floor(i / l))) # calculate modyfing range
+				lastColumn = min(n, Int64(2l + l * floor((i - 1) / l))) # calculate modyfing range
                 for j in k+1:lastColumn
                     a[p[i], j] -= z * a[p[k], j]    # modify current row
                 end
@@ -164,7 +167,7 @@ module Blocksys
                 z = a[p[i], k] / a[p[k], k] # multiplier
 				a[p[i], k] = z	# save multipliers for LU
 
-				lastColumn = min(n, Int64(2l + l * floor(i / l))) # calculate modyfing range
+				lastColumn = min(n, Int64(2l + l * floor((i - 1) / l))) # calculate modyfing range
                 for j in k+1:lastColumn
                     a[p[i], j] -= z * a[p[k], j]    # modify current row
                 end

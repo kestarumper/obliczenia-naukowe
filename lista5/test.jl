@@ -32,8 +32,8 @@ println("")
     end
 end
 
-# dataFileSizes = ["16", "10000", "50000"]
-dataFileSizes = ["16"]
+# dataFileSizes = ["16"]
+dataFileSizes = ["16", "10000", "50000"]
 for size in dataFileSizes
     @testset "$(lpad("Matrix ∈ $(size)×$(size)", 32))" begin
         matFile_A = "$(pwd())/Dane$(size)_1_1/A.txt"
@@ -68,7 +68,6 @@ for size in dataFileSizes
         end
 
         @testset "Specific with CHOICE" begin
-            println("KAPPA")
             @testset "Solve with Gaussian Elimination SPECIFIC with CHOICE" begin
                 A, b, p, x = gaussEliminationSpecific(n, ORIGINAL_A, ORIGINAL_b, l, true)
                 printSparse(A, n, p)
