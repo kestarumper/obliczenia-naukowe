@@ -193,4 +193,25 @@ module Blocksys
 		end
 		return b
 	end
+
+	"""
+	Calculates relative error of 2 vectors
+	"""
+	function relErr(x::AbstractVector, xtild::AbstractVector)
+	    h = x - xtild
+	    normDiff = Float64(norm(h))
+	    xnorm = Float64(norm(x))
+	    return Float64(normDiff / xnorm)
+	end
+
+	function saveVectorToFile(fname::String, x::Array{Float64}, n::Int64, calcErr::Bool)
+		open(fname, "w") do f
+			if calcErr
+				println(f, norm(ones(n) - x) / norm(x))
+			end
+			for val in x
+				println(f, val)
+			end
+		end
+	end
 end

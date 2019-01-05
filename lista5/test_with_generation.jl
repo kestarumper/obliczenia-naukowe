@@ -5,7 +5,7 @@ using Base.Test
 println("")
 
 # dataFileSizes = ["16"]
-dataFileSizes = [16, 100, 1000, 10000, 25000]
+dataFileSizes = [16, 100, 1000, 10000]
 for dsize in dataFileSizes
     @testset "$(lpad("Matrix ∈ $(dsize)×$(dsize)", 32))" begin
         subMatrixSize = 4
