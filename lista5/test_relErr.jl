@@ -25,6 +25,7 @@ for dsize in dataFileSizes
         @test x ≈ expected
         saveVectorToFile("relErr_Gauss_Choice_$dsize.txt", x, n, true)
     end
+
     @testset "LU $dsize" begin
         A, p = buildLU(n, deepcopy(ORIGINAL_A), l)
         x = solveLU(n, A, deepcopy(ORIGINAL_b), l, p)

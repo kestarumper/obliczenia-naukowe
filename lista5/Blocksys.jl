@@ -143,7 +143,7 @@ module Blocksys
         return a, b, p, x
     end
 
-	function buildLU(n::Int, a::SparseMatrixCSC{Float64, Int}, l::Int, choice::Bool = false)
+	function buildLU(n::Int, a::SparseMatrixCSC{Float64, Int}, l::Int, choice::Bool = false, retIterations::Bool = false)
 		p = collect(1:n)
         # a = deepcopy(A)
 		iterations = 0
@@ -174,6 +174,9 @@ module Blocksys
                 end
             end
         end
+		if retIterations
+			return a, p, iterations
+		end
         return a, p
 	end
 
