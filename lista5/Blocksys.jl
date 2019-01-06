@@ -77,7 +77,7 @@ module Blocksys
     end
 
 	function forwardSubstitution(n::Int64, a::SparseMatrixCSC{Float64, Int64}, b::Array{Float64, 1}, p = 1:n, l::Int = 0)
-		b = deepcopy(b)
+		# b = deepcopy(b)
 		for k in 1:(n-1)
 			lastRow = min(n, Int64(l + l * floor(k / l)))
 			for i in (k+1):lastRow
@@ -144,11 +144,12 @@ module Blocksys
         return a, b, p, x
     end
 
-	function buildLU(n::Int, A::SparseMatrixCSC{Float64, Int}, l::Int, choice::Bool = false)
+	function buildLU(n::Int, a::SparseMatrixCSC{Float64, Int}, l::Int, choice::Bool = false)
 		p = collect(1:n)
-        a = deepcopy(A)
+        # a = deepcopy(A)
         for k in 1:n-1
-            lastRow = min(n, Int64(l + l * floor(k / l))) # calculate zeroing range
+            lastRow = min(n, Int64(l + l * floor((k + 1) / l))) # calculate zeroing range
+			lastColumn = min(n, Int64(2l + l * floor((k + 1) / l))) # calculate modyfing range
             for i in k+1:lastRow
 				if choice
 					maxRow = k
@@ -167,7 +168,6 @@ module Blocksys
                 z = a[p[i], k] / a[p[k], k] # multiplier
 				a[p[i], k] = z	# save multipliers for LU
 
-				lastColumn = min(n, Int64(2l + l * floor((i - 1) / l))) # calculate modyfing range
                 for j in k+1:lastColumn
                     a[p[i], j] -= z * a[p[k], j]    # modify current row
                 end
