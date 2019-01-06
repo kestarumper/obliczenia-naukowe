@@ -20,7 +20,7 @@ for dsize in 1000:1000:50000
     matrixCondition = 1.0
     matFile_A = "$(pwd())/Generated/A_$(dsize).txt"
 
-    # blockmat(dsize, subMatrixSize, matrixCondition, matFile_A)
+    blockmat(dsize, subMatrixSize, matrixCondition, matFile_A)
     ORIGINAL_A, n, l = loadMatFromFile(matFile_A)
     ORIGINAL_b = calculateRightSideVector(n, ORIGINAL_A, subMatrixSize)
 

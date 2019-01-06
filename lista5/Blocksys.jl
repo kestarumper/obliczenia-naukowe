@@ -7,7 +7,9 @@ module Blocksys
             gaussEliminationSpecific,
 			buildLU,
 			solveLU,
-			calculateRightSideVector
+			calculateRightSideVector,
+			relErr,
+			saveVectorToFile
 
     function parseInt(x)
         return parse(Int, x)
