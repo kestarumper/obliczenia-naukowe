@@ -1,3 +1,4 @@
+# @author Adrian Mucha
 module Blocksys
     export loadMatFromFile,
             loadVecFromFile,
@@ -62,6 +63,17 @@ module Blocksys
         return b
     end
 
+	"""
+		Wykonuje podstawienie wstecz obliczając rozwiązanie
+		input
+			n - rozmiar macierzy a
+			a - macierz trójkątna górna
+			b - wektor prawych stron
+			p - wektor permutacji
+			l - rozmiar podmacierzy
+		out
+			x - wektor taki że ax = b
+	"""
     function backwardSubstitution(n::Int64, a::SparseMatrixCSC{Float64, Int64}, b::Array{Float64, 1}, p = 1:n, l::Int = 0)
         x = zeros(n)
         for i in n:-1:1
@@ -75,6 +87,17 @@ module Blocksys
         return x
     end
 
+	"""
+		Wykonuje podstawienie w przód obliczając rozwiązanie
+		input
+			n - rozmiar macierzy a
+			a - macierz trójkątna dolna
+			b - wektor prawych stron
+			p - wektor permutacji
+			l - rozmiar podmacierzy
+		out
+			x - ax = b
+	"""
 	function forwardSubstitution(n::Int64, a::SparseMatrixCSC{Float64, Int64}, b::Array{Float64, 1}, p = 1:n, l::Int = 0)
 		# b = deepcopy(b)
 		for k in 1:(n-1)
@@ -86,6 +109,18 @@ module Blocksys
 		return b
 	end
 
+	"""
+		Wykonuje standardową eliminacje gaussa
+		input
+			n - rozmiar macierzy A
+			A - macierz
+			b - wektor prawych stron
+			p - wektor permutacji
+		out
+			A - przekształcone do macierzy trójkątnej górnej
+			b - zmodyfikowany wektor prawych stron
+			x - wektor taki że Ax = b
+	"""
     function gaussElimination(n::Int, A::SparseMatrixCSC{Float64, Int}, b::Array{Float64, 1}, p = 1:n)
         a = deepcopy(A)
         b = deepcopy(b)
@@ -103,10 +138,24 @@ module Blocksys
         return a, b, x
     end
 
-    function gaussEliminationSpecific(n::Int, A::SparseMatrixCSC{Float64, Int}, b::Array{Float64, 1}, l::Int, choice::Bool = false, buildLU::Bool = false)
+	"""
+		Wykonuje eliminacje gaussa uwzględniając specyficzną
+		postać macierzy z zadania
+		input
+			n - rozmiar macierzy A
+			a - macierz
+			b - wektor prawych stron
+			l - rozmiar podmacierzy
+			choice - z wyborem czy bez
+			buildLU - czy zapisywać mnożniki w miejsca eliminowanych elementów
+		out
+			a - przekształcone do macierzy trójkątnej górnej
+			b - zmodyfikowany wektor prawych stron
+			p - obliczony wektor permutacji
+			x - wektor taki że Ax = b
+	"""
+    function gaussEliminationSpecific(n::Int, a::SparseMatrixCSC{Float64, Int}, b::Array{Float64, 1}, l::Int, choice::Bool = false, buildLU::Bool = false)
 		p = collect(1:n)
-        a = deepcopy(A)
-        b = deepcopy(b)
         for k in 1:n-1
             lastRow = min(n, Int64(l + l * floor(k / l))) # calculate zeroing range
             for i in k+1:lastRow
@@ -143,6 +192,19 @@ module Blocksys
         return a, b, p, x
     end
 
+	"""
+		Za pomocą eliminacji Gaussa oblicza macierz LU taką że a = LU
+		input
+			n - rozmiar macierzy A
+			a - macierz
+			l - rozmiar podmacierzy
+			choice - z wyborem czy bez
+			retIterations - czy zwrócić ilość wykonanych
+							iteracji [na potrzeby testów]
+		out
+			a - przekształcone do macierzy LU
+			p - obliczony wektor permutacji
+	"""
 	function buildLU(n::Int, a::SparseMatrixCSC{Float64, Int}, l::Int, choice::Bool = false, retIterations::Bool = false)
 		p = collect(1:n)
         # a = deepcopy(A)
@@ -180,12 +242,27 @@ module Blocksys
         return a, p
 	end
 
+	"""
+	Rozwiązuje układ równań używając obliczonej wcześniej macierzy LU
+	za pomocą dwóch układów Lz = b oraz Ux = z
+	input
+		n - rozmiar macierzy a
+		a - macierz LU
+		b - wektor prawych stron
+		l - rozmiar podmacierzy
+		p - wektor permutacji
+	out
+		x - wektor taki że ax = LUx = b
+	"""
 	function solveLU(n::Int, a::SparseMatrixCSC{Float64, Int}, b::Array{Float64, 1}, l::Int, p = 1:n)
 		z = forwardSubstitution(n, a, b, p, l) # solve lower LU matrix
 		x = backwardSubstitution(n, a, z, p, l) # solve upper LU matrix
 		return x
 	end
 
+	"""
+	Oblicza wektor prawych stron zakładając że x = [1,1,...,1]^T
+	"""
 	function calculateRightSideVector(n::Int, a::SparseMatrixCSC{Float64, Int}, l::Int)
 		b = zeros(n)
 		for row in 1:n
